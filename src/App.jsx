@@ -12,6 +12,7 @@ import Exercises from './pages/Exercises';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import About from './pages/About';
+import ExerciseDetail from './pages/ExerciseDetail';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/log/:sessionId/summary" element={<LogSummary />} />
         <Route path="/history" element={<History />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/exercises/:exerciseId" element={<ExerciseDetail />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/about" element={<About />} />
       </Routes>

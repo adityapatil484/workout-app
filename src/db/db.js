@@ -12,6 +12,4 @@ db.version(1).stores({
   streakData:       'id',
 });
 
-db.open().catch((err) => console.error('Failed to open db:', err));
-
 export default db;
