@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Settings, Flame, Calendar, Dumbbell, TrendingUp, ChevronRight, Camera } from 'lucide-react';
 import db from '../db/db.js';
+import { getActivePlan } from '../lib/planStorage.js';
+import { SPLIT_LABELS, GOAL_LABELS } from '../lib/planLabels.js';
 
 const EXPERIENCE_LABELS = {
   beginner:     'Beginner',
@@ -54,14 +56,19 @@ function StatCard({ icon: Icon, value, label }) {
 }
 
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile]       = useState(null);
+  const [activePlan, setActivePlan] = useState(undefined);
+  const [loading, setLoading]       = useState(true);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    db.userProfile.get(1).then((p) => {
+    Promise.all([
+      db.userProfile.get(1),
+      getActivePlan(),
+    ]).then(([p, plan]) => {
       setProfile(p ?? null);
+      setActivePlan(plan ?? null);
       setLoading(false);
     });
   }, []);
@@ -80,7 +87,7 @@ export default function Profile() {
     }
   }
 
-  if (loading || !profile) return null;
+  if (loading || !profile || activePlan === undefined) return null;
 
   const initial     = profile.name?.charAt(0).toUpperCase() || '?';
   const weightUnits = profile.weightUnits || 'kg';
@@ -150,16 +157,39 @@ export default function Profile() {
 
       {/* Active plan card */}
       <div className="max-w-md mx-auto px-6 mt-6 mb-12">
-        <button
-          onClick={() => navigate('/plan')}
-          className="w-full bg-bg-card rounded-3xl p-6 flex items-center justify-between"
-        >
-          <div className="text-left">
-            <p className="text-lg font-semibold text-text-primary">No active plan</p>
-            <p className="text-sm text-text-secondary mt-1">Generate one to get started</p>
-          </div>
-          <ChevronRight size={20} className="text-text-secondary flex-shrink-0" />
-        </button>
+        {activePlan ? (
+          <Link
+            to="/plan"
+            className="block bg-bg-card rounded-3xl p-6 flex items-center justify-between"
+          >
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-text-secondary uppercase tracking-wide">
+                Active plan
+              </p>
+              <p className="text-[22px] font-bold text-text-primary mt-1 leading-tight">
+                {activePlan.name}
+              </p>
+              <p className="text-sm text-text-secondary mt-1">
+                {SPLIT_LABELS[activePlan.splitType] || activePlan.splitType}
+                {' · '}
+                {activePlan.daysPerWeek} days/week
+                {activePlan.goal ? ` · ${GOAL_LABELS[activePlan.goal] || activePlan.goal}` : ''}
+              </p>
+            </div>
+            <ChevronRight size={20} className="text-text-secondary flex-shrink-0 ml-4" />
+          </Link>
+        ) : (
+          <button
+            onClick={() => navigate('/plan')}
+            className="w-full bg-bg-card rounded-3xl p-6 flex items-center justify-between"
+          >
+            <div className="text-left">
+              <p className="text-lg font-semibold text-text-primary">No active plan</p>
+              <p className="text-sm text-text-secondary mt-1">Generate one to get started</p>
+            </div>
+            <ChevronRight size={20} className="text-text-secondary flex-shrink-0" />
+          </button>
+        )}
       </div>
     </div>
   );
