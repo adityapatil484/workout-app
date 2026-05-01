@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProfileGate from './components/ProfileGate';
 import Onboarding from './pages/Onboarding';
 import Today from './pages/Today';
 import Plan from './pages/Plan';
@@ -19,21 +20,23 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/today" replace />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route element={<Layout />}>
-          <Route path="/today" element={<Today />} />
-          <Route path="/plan" element={<Plan />} />
-          <Route path="/progress" element={<Progress />} />
-          <Route path="/profile" element={<Profile />} />
+        <Route element={<ProfileGate />}>
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route element={<Layout />}>
+            <Route path="/today" element={<Today />} />
+            <Route path="/plan" element={<Plan />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          <Route path="/log/:sessionId" element={<LogSession />} />
+          <Route path="/log/:sessionId/exercise/:exerciseId" element={<LogExercise />} />
+          <Route path="/log/:sessionId/summary" element={<LogSummary />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/exercises" element={<Exercises />} />
+          <Route path="/exercises/:exerciseId" element={<ExerciseDetail />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/about" element={<About />} />
         </Route>
-        <Route path="/log/:sessionId" element={<LogSession />} />
-        <Route path="/log/:sessionId/exercise/:exerciseId" element={<LogExercise />} />
-        <Route path="/log/:sessionId/summary" element={<LogSummary />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/exercises" element={<Exercises />} />
-        <Route path="/exercises/:exerciseId" element={<ExerciseDetail />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/about" element={<About />} />
       </Routes>
     </BrowserRouter>
   );
