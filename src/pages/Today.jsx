@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { getActivePlan } from '../lib/planStorage.js';
 import db from '../db/db.js';
@@ -18,9 +18,18 @@ function formatDate(d) {
   return `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`;
 }
 
+function todayISODate() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export default function Today() {
   const [plan, setPlan]     = useState(undefined);
   const [libMap, setLibMap] = useState(new Map());
+  const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([
@@ -127,7 +136,33 @@ export default function Today() {
       {/* Sticky CTA */}
       <div className="fixed bottom-20 left-0 right-0 px-4">
         <button
-          onClick={() => window.alert('Workout logging coming in the next subtask.')}
+          onClick={async () => {
+            const activePlan = await getActivePlan();
+            const dayIndex   = todayDayIndex();
+            const dateStr    = todayISODate();
+
+            const inProgress = await db.workoutSessions
+              .filter(s =>
+                s.planId    === activePlan.id &&
+                s.dayIndex  === dayIndex      &&
+                s.date      === dateStr       &&
+                (s.finishedAt === null || s.finishedAt === undefined)
+              )
+              .first();
+
+            if (inProgress) {
+              const age = Date.now() - new Date(inProgress.startedAt).getTime();
+              if (age < 24 * 60 * 60 * 1000) {
+                navigate(`/log/${inProgress.id}`);
+                return;
+              }
+              // Stale session — close it out
+              const fakeFinish = new Date(new Date(inProgress.startedAt).getTime() + 60 * 60 * 1000).toISOString();
+              await db.workoutSessions.update(inProgress.id, { finishedAt: fakeFinish, duration: 3600 });
+            }
+
+            navigate('/log/new');
+          }}
           className="w-full bg-accent text-bg-base font-semibold rounded-full py-4"
         >
           Start workout
