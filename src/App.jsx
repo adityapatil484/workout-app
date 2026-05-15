@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import About from './pages/About';
 import ExerciseDetail from './pages/ExerciseDetail';
 import PlanDay from './pages/PlanDay';
+import SwapPicker from './pages/SwapPicker';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           </Route>
           <Route path="/log/:sessionId" element={<LogSession />} />
           <Route path="/log/:sessionId/exercise/:exerciseId" element={<LogExercise />} />
+          <Route path="/log/:sessionId/exercise/:exerciseId/swap" element={<SwapPicker />} />
           <Route path="/log/:sessionId/summary" element={<LogSummary />} />
           <Route path="/history" element={<History />} />
           <Route path="/plan/day/:dayIndex" element={<PlanDay />} />

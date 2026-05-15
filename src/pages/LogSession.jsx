@@ -133,6 +133,7 @@ export default function LogSession() {
           const totalSets  = prescribedSets[ex.exerciseId] ?? ex.planEx?.targetSets ?? 3;
           const allDone    = doneSets >= totalSets && totalSets > 0;
           const anyDone    = doneSets > 0;
+          const isSkipped  = loggedEx?.skipped === true && !anyDone;
 
           const destId = sessionId === 'new' ? 'new' : session?.id ?? 'new';
 
@@ -157,19 +158,28 @@ export default function LogSession() {
               )}
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary truncate">{ex.name ?? ex.exerciseId}</p>
+                <div className="flex items-center gap-2 min-w-0">
+                  <p className="font-semibold text-text-primary truncate">{ex.name ?? ex.exerciseId}</p>
+                  {isSkipped && (
+                    <span className="flex-shrink-0 bg-bg-elevated text-text-tertiary text-xs rounded-full px-2 py-1">
+                      Skipped
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-text-secondary mt-0.5">
                   {ex.planEx?.targetSets} × {ex.planEx?.targetReps} · {ex.planEx?.restSeconds}s rest
                 </p>
                 <p className={[
                   'text-sm mt-1',
-                  allDone  ? 'text-accent font-medium'  :
-                  anyDone  ? 'text-text-secondary'       :
-                             'text-text-tertiary',
+                  allDone   ? 'text-accent font-medium' :
+                  isSkipped ? 'text-text-tertiary'       :
+                  anyDone   ? 'text-text-secondary'      :
+                              'text-text-tertiary',
                 ].join(' ')}>
-                  {allDone  ? '✓ Complete'                      :
-                   anyDone  ? `${doneSets} / ${totalSets} sets done` :
-                              'Not started'}
+                  {allDone   ? '✓ Complete'                          :
+                   isSkipped ? 'Skipped'                              :
+                   anyDone   ? `${doneSets} / ${totalSets} sets done` :
+                               'Not started'}
                 </p>
               </div>
 

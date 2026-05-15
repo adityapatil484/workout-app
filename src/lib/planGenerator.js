@@ -113,7 +113,7 @@ function filterLibrary(library, userProfile) {
   });
 }
 
-const CANONICAL_EXERCISE_IDS = new Set([
+export const CANONICAL_EXERCISE_IDS = new Set([
   // Chest — press
   'Barbell_Bench_Press_-_Medium_Grip',
   'Barbell_Incline_Bench_Press_-_Medium_Grip',

@@ -14,6 +14,7 @@
     "dexie-react-hooks": "^4.4.0",
     "lucide-react": "^1.14.0",
     "react": "^19.2.5",
+    "react-body-highlighter": "^2.0.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "react-window": "^1.8.11"
